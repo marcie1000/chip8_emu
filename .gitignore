@@ -1,0 +1,8 @@
+#executable shortcut
+chip8_emu
+
+chip8_emu.mk
+..gitignore.swp
+.clangd
+.clang-format
+/Debug
