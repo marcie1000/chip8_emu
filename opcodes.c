@@ -128,9 +128,12 @@ void opcode_8XY4(s_emulator *emulator, Uint8 b3_X, Uint8 b2_Y, UNUSED Uint8 b1_4
 //Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there is not. 
 {
     s_cpu *cpu = &emulator->cpu;
-    //VF = VY > 0xFF - VX
-    cpu->V[0xF] = cpu->V[b2_Y] > (0xFF - cpu->V[b3_X]);
-    cpu->V[b3_X] += cpu->V[b2_Y];
+    Uint16 VX_tmp = cpu->V[b3_X];
+    Uint16 VY_tmp = cpu->V[b2_Y];
+    VX_tmp += VY_tmp;
+    cpu->V[0xF] = VX_tmp > 255;
+    VX_tmp &= ~(0xFF00U);
+    cpu->V[b3_X] = (Uint8)VX_tmp;    
 }
 
 void opcode_8XY5(s_emulator *emulator, Uint8 b3_X, Uint8 b2_Y, UNUSED Uint8 b1_5)
@@ -138,9 +141,13 @@ void opcode_8XY5(s_emulator *emulator, Uint8 b3_X, Uint8 b2_Y, UNUSED Uint8 b1_5
 //and 1 when there is not. 
 {
     s_cpu *cpu = &emulator->cpu;
-    //VF = VY < VX
-    cpu->V[0xF] = cpu->V[b2_Y] < cpu->V[b3_X];
-    cpu->V[b2_Y] -= cpu->V[b3_X];
+    Sint16 VX_tmp = cpu->V[b3_X];
+    Sint16 VY_tmp = cpu->V[b2_Y];
+    cpu->V[0xF] = 1;
+    VX_tmp -= VY_tmp;
+    cpu->V[0xF] = (VX_tmp > 0);
+    VX_tmp &= ~(0xFF00U);
+    cpu->V[b3_X] = (Uint8)VX_tmp;
 }
 
 void opcode_8XY6(s_emulator *emulator, Uint8 b3_X, UNUSED Uint8 b2_Y, UNUSED Uint8 b1_6)
@@ -157,9 +164,9 @@ void opcode_8XY7(s_emulator *emulator, Uint8 b3_X, Uint8 b2_Y, UNUSED Uint8 b1_7
 //and 1 when there is not. 
 {
     s_cpu *cpu = &emulator->cpu;
+    cpu->V[b3_X] = cpu->V[b2_Y] - cpu->V[b3_X];
     //VF = VY < VX
     cpu->V[0xF] = cpu->V[b3_X] <= cpu->V[b2_Y];
-    cpu->V[b3_X] = cpu->V[b2_Y] - cpu->V[b3_X];
 }
 
 void opcode_8XYE(s_emulator *emulator, Uint8 b3_X, UNUSED Uint8 b2_Y, UNUSED Uint8 b1_E)
@@ -307,6 +314,7 @@ void opcode_FX0A(s_emulator *emulator, Uint8 b3_X, UNUSED Uint8 b2_0, UNUSED Uin
                 return;
             }
         }
+        update_screen(&emulator->screen);
         SDL_Delay(FPS_DELAY);
     }
 }

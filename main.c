@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     if(argc <= 1)
     {
         printf("Please give a ROM file in argument.\n");
-        snprintf(rom_filename, 255, "BC_test.ch8");
+        snprintf(rom_filename, 255, "roms/4-flags.ch8");
     }
     else
         snprintf(rom_filename, 255, "%s", argv[1]);

@@ -6,3 +6,7 @@ chip8_emu.mk
 .clangd
 .clang-format
 /Debug
+/Build
+/build
+/roms
+build.sh
